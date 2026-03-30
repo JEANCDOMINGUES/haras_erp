@@ -1,5 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { ENV } from "./_core/env";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import {
@@ -136,7 +137,7 @@ export const appRouter = router({
   system: systemRouter,
 
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -144,6 +145,16 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    devStatus: publicProcedure.query(() => ({
+      devMode: ENV.devMode,
+      user: ENV.devMode
+        ? {
+            openId: ENV.devUserId,
+            name: ENV.devUserName,
+            role: ENV.devUserRole,
+          }
+        : null,
+    })),
   }),
 
   // ========================================================================
@@ -176,11 +187,9 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    getById: protectedProcedure
-      .input(z.number())
-      .query(async ({ input }) => {
-        return await getHarasById(input);
-      }),
+    getById: protectedProcedure.input(z.number()).query(async ({ input }) => {
+      return await getHarasById(input);
+    }),
   }),
 
   // ========================================================================
@@ -268,7 +277,9 @@ export const appRouter = router({
           ...input,
           harasId: ctx.user.harasId,
           status: "disponivel",
-          valorAluguel: input.valorAluguel ? String(input.valorAluguel) : undefined,
+          valorAluguel: input.valorAluguel
+            ? String(input.valorAluguel)
+            : undefined,
         } as any);
 
         return { success: true, id: (result as any).insertId };
@@ -335,7 +346,9 @@ export const appRouter = router({
           ...input,
           harasId: ctx.user.harasId,
           status: "agendada",
-          custoServico: input.custoServico ? String(input.custoServico) : undefined,
+          custoServico: input.custoServico
+            ? String(input.custoServico)
+            : undefined,
         } as any);
 
         return { success: true, id: (result as any).insertId };
@@ -573,7 +586,10 @@ export const appRouter = router({
           leilaoId: z.number(),
           numero: z.number(),
           cavaloId: z.number(),
-          lanceInicial: z.string().or(z.number()).transform(v => String(v)),
+          lanceInicial: z
+            .string()
+            .or(z.number())
+            .transform(v => String(v)),
         })
       )
       .mutation(async ({ input, ctx }) => {

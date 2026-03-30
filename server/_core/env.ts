@@ -7,4 +7,8 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  devMode: process.env.DEV_MODE === "true",
+  devUserId: process.env.DEV_USER_ID ?? "dev-user-1",
+  devUserName: process.env.DEV_USER_NAME ?? "Dev User",
+  devUserRole: (process.env.DEV_USER_ROLE as "admin" | "user") ?? "admin",
 };
