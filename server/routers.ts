@@ -35,9 +35,16 @@ import {
   createTransacao,
   getAlertasByUsuario,
   marcarAlertaComoLido,
+  validarAcessoRecurso,
+  PaginationParams,
 } from "./db";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+
+const PaginationSchema = z.object({
+  page: z.number().min(1).optional().default(1),
+  limit: z.number().min(1).max(100).optional().default(20),
+});
 
 // ============================================================================
 // SCHEMAS DE VALIDAÇÃO
@@ -216,16 +223,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getCavalosByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getCavalosByHaras(ctx.user.harasId, input);
+      }),
 
     getById: protectedProcedure
       .input(z.number())
@@ -285,16 +305,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getBaiasByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getBaiasByHaras(ctx.user.harasId, input);
+      }),
 
     getById: protectedProcedure
       .input(z.number())
@@ -354,16 +387,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getCoberturasByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getCoberturasByHaras(ctx.user.harasId, input);
+      }),
 
     update: protectedProcedure
       .input(
@@ -407,16 +453,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getProprietariosByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getProprietariosByHaras(ctx.user.harasId, input);
+      }),
 
     getById: protectedProcedure
       .input(z.number())
@@ -457,16 +516,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getConsignacoesByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getConsignacoesByHaras(ctx.user.harasId, input);
+      }),
 
     getById: protectedProcedure
       .input(z.number())
@@ -533,16 +605,29 @@ export const appRouter = router({
         return { success: true, id: (result as any).insertId };
       }),
 
-    list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.harasId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não associado a um haras",
-        });
-      }
+    list: protectedProcedure
+      .input(PaginationSchema)
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user.harasId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Usuário não associado a um haras",
+          });
+        }
 
-      return await getLeiloesByHaras(ctx.user.harasId);
-    }),
+        const access = await validarAcessoRecurso(
+          ctx.user.id,
+          ctx.user.harasId
+        );
+        if (!access.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: access.reason,
+          });
+        }
+
+        return await getLeiloesByHaras(ctx.user.harasId, input);
+      }),
 
     getById: protectedProcedure
       .input(z.number())
